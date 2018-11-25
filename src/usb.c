@@ -562,7 +562,7 @@ static int usb_device_add(libusb_device* dev)
 	return 0;
 }
 
-int usb_discover(const unsigned char *bus_num, const unsigned char *dev_num) 
+int usb_discover(const char *bus_num, const char *dev_num) 
 {
 	int cnt, i;
 	int valid_count = 0;
@@ -594,7 +594,7 @@ int usb_discover(const unsigned char *bus_num, const unsigned char *dev_num)
 	usbmuxd_log(LL_SPEW, "usb_discover: ### scanning device: %d : %d ", bus, address);
 	// Mark all devices as dead, and do a mark-sweep like
 	// collection of dead devices
-	int i=0;
+	i=0;
 	FOREACH(struct usb_device *usbdev, &device_list) {
 		usbdev->alive = 0;
 		if(usbdev->bus == bus && usbdev->address == address) {
@@ -714,7 +714,7 @@ int usb_get_timeout(void)
 	return msec;
 }
 
-int usb_process(const unsigned char *bus_num, const unsigned char *dev_num)
+int usb_process(const char *bus_num, const char *dev_num)
 {
 	int res;
 	struct timeval tv;
@@ -792,7 +792,7 @@ static int usb_hotplug_cb(libusb_context *ctx, libusb_device *device, libusb_hot
 }
 #endif
 
-int usb_init(const unsigned char *bus_num, const unsigned char *dev_num)
+int usb_init(const char *bus_num, const char *dev_num)
 {
 	int res;
 	usbmuxd_log(LL_DEBUG, "usb_init for linux / libusb 1.0");
