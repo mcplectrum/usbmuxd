@@ -714,7 +714,7 @@ int usb_get_timeout(void)
 	return msec;
 }
 
-int usb_process(void)
+int usb_process(const unsigned char *bus_num, const unsigned char *dev_num)
 {
 	int res;
 	struct timeval tv;
@@ -792,7 +792,7 @@ static int usb_hotplug_cb(libusb_context *ctx, libusb_device *device, libusb_hot
 }
 #endif
 
-int usb_init(void)
+int usb_init(const unsigned char *bus_num, const unsigned char *dev_num)
 {
 	int res;
 	usbmuxd_log(LL_DEBUG, "usb_init for linux / libusb 1.0");
