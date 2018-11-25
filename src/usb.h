@@ -49,7 +49,7 @@
 
 struct usb_device;
 
-int usb_init(void);
+int usb_init(const unsigned char *bus_num, const unsigned char *dev_num);
 void usb_shutdown(void);
 const char *usb_get_serial(struct usb_device *dev);
 uint32_t usb_get_location(struct usb_device *dev);
@@ -60,7 +60,7 @@ int usb_get_timeout(void);
 int usb_send(struct usb_device *dev, const unsigned char *buf, int length);
 int usb_discover(const unsigned char *bus_num, const unsigned char *dev_num);
 void usb_autodiscover(int enable);
-int usb_process(void);
+int usb_process(const unsigned char *bus_num, const unsigned char *dev_num);
 int usb_process_timeout(int msec);
 
 #endif

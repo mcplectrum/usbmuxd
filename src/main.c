@@ -220,7 +220,7 @@ static int main_loop(int listenfd)
 				}
 			}
 		} else if(cnt == 0) {
-			if(usb_process() < 0) {
+			if(usb_process(bus_num, dev_num) < 0) {
 				usbmuxd_log(LL_FATAL, "usb_process() failed");
 				fdlist_free(&pollfds);
 				return -1;
@@ -231,7 +231,7 @@ static int main_loop(int listenfd)
 			for(i=0; i<pollfds.count; i++) {
 				if(pollfds.fds[i].revents) {
 					if(!done_usb && pollfds.owners[i] == FD_USB) {
-						if(usb_process() < 0) {
+						if(usb_process(bus_num, dev_num) < 0) {
 							usbmuxd_log(LL_FATAL, "usb_process() failed");
 							fdlist_free(&pollfds);
 							return -1;
@@ -702,7 +702,7 @@ int main(int argc, char *argv[])
 	client_init();
 	device_init();
 	usbmuxd_log(LL_INFO, "Initializing USB");
-	if((res = usb_init()) < 0)
+	if((res = usb_init(bus_num, dev_num)) < 0)
 		goto terminate;
 
 	usbmuxd_log(LL_INFO, "%d device%s detected", res, (res==1)?"":"s");

@@ -729,7 +729,7 @@ int usb_process(void)
 	reap_dead_devices();
 
 	if(dev_poll_remain_ms() <= 0) {
-		res = usb_discover();
+		res = usb_discover(bus_num, dev_num);
 		if(res < 0) {
 			usbmuxd_log(LL_ERROR, "usb_discover failed: %d", res);
 			return res;
@@ -822,7 +822,7 @@ int usb_init(void)
 	}
 #endif
 	if (device_polling) {
-		res = usb_discover();
+		res = usb_discover(bus_num, dev_num);
 		if (res >= 0) {
 		}
 	} else {
