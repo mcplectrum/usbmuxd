@@ -562,7 +562,7 @@ static int usb_device_add(libusb_device* dev)
 	return 0;
 }
 
-int usb_discover(void)
+int usb_discover(const unsigned char *bus_num, const unsigned char *dev_num) 
 {
 	int cnt, i;
 	int valid_count = 0;
@@ -588,21 +588,27 @@ int usb_discover(void)
 
 	usbmuxd_log(LL_SPEW, "usb_discover: scanning %d devices", cnt);
 
+	uint8_t bus = (uint8_t)atoi(bus_num);
+	uint8_t address = (uint8_t)atoi(dev_num);
+
+	usbmuxd_log(LL_SPEW, "usb_discover: ### scanning device: %d : %d ", bus, address);
 	// Mark all devices as dead, and do a mark-sweep like
 	// collection of dead devices
+	int i=0;
 	FOREACH(struct usb_device *usbdev, &device_list) {
 		usbdev->alive = 0;
-	} ENDFOREACH
-
-	// Enumerate all USB devices and mark the ones we already know
-	// about as live, again
-	for(i=0; i<cnt; i++) {
-		libusb_device *dev = devs[i];
+		if(usbdev->bus == bus && usbdev->address == address) {
+			libusb_device *dev = devs[i];
 		if (usb_device_add(dev) < 0) {
+	usbmuxd_log(LL_SPEW, "usb_discover: ### Added device");
 			continue;
 		}
 		valid_count++;
-	}
+		}
+		i++;
+	} ENDFOREACH
+
+
 
 	// Clean out any device we didn't mark back as live
 	reap_dead_devices();

@@ -60,6 +60,10 @@ static int foreground = 0;
 static int drop_privileges = 0;
 static const char *drop_user = NULL;
 static int opt_disable_hotplug = 0;
+static int opt_device_address = 0;
+static const char *device_address = NULL;
+static const char *bus_num = NULL;
+static const char *dev_num = NULL;
 static int opt_enable_exit = 0;
 static int opt_exit = 0;
 static int exit_signal = 0;
@@ -212,7 +216,7 @@ static int main_loop(int listenfd)
 				if(should_discover) {
 					should_discover = 0;
 					usbmuxd_log(LL_INFO, "Device discovery triggered");
-					usb_discover();
+					usb_discover(bus_num, dev_num);
 				}
 			}
 		} else if(cnt == 0) {
@@ -362,6 +366,7 @@ static void usage()
 	printf("  -v, --verbose\t\tBe verbose (use twice or more to increase).\n");
 	printf("  -f, --foreground\tDo not daemonize (implies one -v).\n");
 	printf("  -U, --user USER\tChange to this user after startup (needs USB privileges).\n");
+	printf("  -a, --device-address BUSNUM:DEVNUM\tfind single device by bus an device number\n");
 	printf("  -n, --disable-hotplug\tDisables automatic discovery of devices on hotplug.\n");
 	printf("                       \tStarting another instance will trigger discovery instead.\n");
 	printf("  -z, --enable-exit\tEnable \"--exit\" request from other instances and exit\n");
@@ -387,6 +392,7 @@ static void parse_opts(int argc, char **argv)
 		{"foreground", 0, NULL, 'f'},
 		{"verbose", 0, NULL, 'v'},
 		{"user", 1, NULL, 'U'},
+		{"device-address", 1, NULL, 'a'},
 		{"disable-hotplug", 0, NULL, 'n'},
 		{"enable-exit", 0, NULL, 'z'},
 #ifdef HAVE_UDEV
@@ -433,6 +439,9 @@ static void parse_opts(int argc, char **argv)
 			drop_privileges = 1;
 			drop_user = optarg;
 			break;
+		case 'a':
+			opt_device_address = 1;
+			device_address = optarg;
 #ifdef HAVE_UDEV
 		case 'u':
 			opt_disable_hotplug = 1;
@@ -616,7 +625,26 @@ int main(int argc, char *argv[])
 		}
 	}
 #endif
+     
+	 if (opt_device_address) {
+		 if(!device_address) {
+			usbmuxd_log(LL_FATAL, "No device address to search for?");
+			res = -1;
+			goto terminate;
+		 }
 
+  	bus_num = strtok(device_address, ":");
+  	dev_num = strtok(device_address, ":");
+  	 if(!bus_num && !dev_num) {
+			usbmuxd_log(LL_FATAL, "Invalid address to search for?");
+			res = -1;
+			goto terminate;
+		 }
+
+		 
+		  )
+
+	 }
 	// drop elevated privileges
 	if (drop_privileges && (getuid() == 0 || geteuid() == 0)) {
 		struct passwd *pw;
